@@ -6,6 +6,7 @@ import ctypes
 from enum import IntEnum, auto
 
 EMTM_MAX_CHARS = 1024
+libc = ctypes.CDLL('./emtmlibpy/libEMTMLib.so')
 
 
 class Result(IntEnum):
@@ -23,28 +24,29 @@ class EmPointData(ctypes.Structure):
     """
     Point structures used by libEMTLib.so from SeaGIS
     """
-    _fields_ = {
-        ('str_op_code', ctypes.create_string_buffer(b'', EMTM_MAX_CHARS)),
-        ('str_filename', ctypes.create_string_buffer(b'', EMTM_MAX_CHARS)),
+    _fields_ = [
+        # ('str_op_code', ctypes.c_char * EMTM_MAX_CHARS)),
+        ('str_op_code', ctypes.c_char * EMTM_MAX_CHARS),
+        ('str_filename', ctypes.c_char * EMTM_MAX_CHARS),
         ('n_frame', ctypes.c_int),
         ('d_time_mins', ctypes.c_double),
-        ('str_period', ctypes.create_string_buffer(b'', EMTM_MAX_CHARS)),
+        ('str_period', ctypes.c_char * EMTM_MAX_CHARS),
         ('d_period_time_mins', ctypes.c_double),
         ('d_imx', ctypes.c_double),
         ('d_imy', ctypes.c_double),
         ('d_rectx', ctypes.c_double),
         ('d_recty', ctypes.c_double),
-        ('str_family', ctypes.create_string_buffer(b'', EMTM_MAX_CHARS)),
-        ('str_genus', ctypes.create_string_buffer(b'', EMTM_MAX_CHARS)),
-        ('str_species', ctypes.create_string_buffer(b'', EMTM_MAX_CHARS)),
-        ('str_code', ctypes.create_string_buffer(b'', EMTM_MAX_CHARS)),
-        ('str_number', ctypes.create_string_buffer(b'', EMTM_MAX_CHARS)),
-        ('str_stage', ctypes.create_string_buffer(b'', EMTM_MAX_CHARS)),
-        ('str_activity', ctypes.create_string_buffer(b'', EMTM_MAX_CHARS)),
-        ('str_comment', ctypes.create_string_buffer(b'', EMTM_MAX_CHARS)),
-        ('str_att_9', ctypes.create_string_buffer(b'', EMTM_MAX_CHARS)),
-        ('str_att_10', ctypes.create_string_buffer(b'', EMTM_MAX_CHARS))
-    }
+        ('str_family', ctypes.c_char * EMTM_MAX_CHARS),
+        ('str_genus', ctypes.c_char * EMTM_MAX_CHARS),
+        ('str_species', ctypes.c_char * EMTM_MAX_CHARS),
+        ('str_code', ctypes.c_char * EMTM_MAX_CHARS),
+        ('str_number', ctypes.c_char * EMTM_MAX_CHARS),
+        ('str_stage', ctypes.c_char * EMTM_MAX_CHARS),
+        ('str_activity', ctypes.c_char * EMTM_MAX_CHARS),
+        ('str_comment', ctypes.c_char * EMTM_MAX_CHARS),
+        ('str_att_9', ctypes.c_char * EMTM_MAX_CHARS),
+        ('str_att_10', ctypes.c_char * EMTM_MAX_CHARS)
+    ]
 
     def __int__(self, str_op_code,
                 str_filename,
@@ -88,14 +90,14 @@ class Em3DPpointData(ctypes.Structure):
     """
     3DPoint structures used by libEMTLib.so from SeaGIS
     """
-    _fields_ = {
-        ('str_op_code', ctypes.create_string_buffer(b'', EMTM_MAX_CHARS)),
-        ('str_filename_left', ctypes.create_string_buffer(b'', EMTM_MAX_CHARS)),
-        ('str_filename_right', ctypes.create_string_buffer(b'', EMTM_MAX_CHARS)),
+    _fields_ = [
+        ('str_op_code', ctypes.c_char * EMTM_MAX_CHARS),
+        ('str_filename_left', ctypes.c_char * EMTM_MAX_CHARS),
+        ('str_filename_right', ctypes.c_char * EMTM_MAX_CHARS),
         ('n_frame_left', ctypes.c_int),
         ('n_frame_right', ctypes.c_int),
         ('d_time_mins', ctypes.c_double),
-        ('str_period', ctypes.create_string_buffer(b'', EMTM_MAX_CHARS)),
+        ('str_period', ctypes.c_char * EMTM_MAX_CHARS),
         ('d_period_time_mins', ctypes.c_double),
         ('d_imx_left', ctypes.c_double),
         ('d_imy_left', ctypes.c_double),
@@ -110,17 +112,17 @@ class Em3DPpointData(ctypes.Structure):
         ('d_rms', ctypes.c_double),
         ('d_range', ctypes.c_double),
         ('d_direction', ctypes.c_double),
-        ('str_family', ctypes.create_string_buffer(b'', EMTM_MAX_CHARS)),
-        ('str_genus', ctypes.create_string_buffer(b'', EMTM_MAX_CHARS)),
-        ('str_species', ctypes.create_string_buffer(b'', EMTM_MAX_CHARS)),
-        ('str_code', ctypes.create_string_buffer(b'', EMTM_MAX_CHARS)),
-        ('str_number', ctypes.create_string_buffer(b'', EMTM_MAX_CHARS)),
-        ('str_stage', ctypes.create_string_buffer(b'', EMTM_MAX_CHARS)),
-        ('str_activity', ctypes.create_string_buffer(b'', EMTM_MAX_CHARS)),
-        ('str_comment', ctypes.create_string_buffer(b'', EMTM_MAX_CHARS)),
-        ('str_att_9', ctypes.create_string_buffer(b'', EMTM_MAX_CHARS)),
-        ('str_att_10', ctypes.create_string_buffer(b'', EMTM_MAX_CHARS))
-    }
+        ('str_family', ctypes.c_char * EMTM_MAX_CHARS),
+        ('str_genus', ctypes.c_char * EMTM_MAX_CHARS),
+        ('str_species', ctypes.c_char * EMTM_MAX_CHARS),
+        ('str_code', ctypes.c_char * EMTM_MAX_CHARS),
+        ('str_number', ctypes.c_char * EMTM_MAX_CHARS),
+        ('str_stage', ctypes.c_char * EMTM_MAX_CHARS),
+        ('str_activity', ctypes.c_char * EMTM_MAX_CHARS),
+        ('str_comment', ctypes.c_char * EMTM_MAX_CHARS),
+        ('str_att_9', ctypes.c_char * EMTM_MAX_CHARS),
+        ('str_att_10', ctypes.c_char * EMTM_MAX_CHARS)
+    ]
 
     def __int__(self, str_op_code,
                 str_filename_left, str_filename_right,
@@ -179,14 +181,14 @@ class EmLengthData(ctypes.Structure):
     """
     Length structures used by libEMTLib.so from SeaGIS
     """
-    _fields_ = {
-        ('str_op_code', ctypes.create_string_buffer(b'', EMTM_MAX_CHARS)),
-        ('str_filename_left', ctypes.create_string_buffer(b'', EMTM_MAX_CHARS)),
-        ('str_filename_right', ctypes.create_string_buffer(b'', EMTM_MAX_CHARS)),
+    _fields_ = [
+        ('str_op_code', ctypes.c_char * EMTM_MAX_CHARS),
+        ('str_filename_left', ctypes.c_char * EMTM_MAX_CHARS),
+        ('str_filename_right', ctypes.c_char * EMTM_MAX_CHARS),
         ('n_frame_left', ctypes.c_int),
         ('n_frame_right', ctypes.c_int),
         ('d_time_mins', ctypes.c_double),
-        ('str_period', ctypes.create_string_buffer(b'', EMTM_MAX_CHARS)),
+        ('str_period', ctypes.c_char * EMTM_MAX_CHARS),
         ('d_period_time_mins', ctypes.c_double),
         ('b_compound_length', ctypes.c_bool),
         ('d_imx1_left', ctypes.c_double),
@@ -205,17 +207,17 @@ class EmLengthData(ctypes.Structure):
         ('dx_mid', ctypes.c_double),
         ('dy_mid', ctypes.c_double),
         ('dz_mid', ctypes.c_double),
-        ('str_family', ctypes.create_string_buffer(b'', EMTM_MAX_CHARS)),
-        ('str_genus', ctypes.create_string_buffer(b'', EMTM_MAX_CHARS)),
-        ('str_species', ctypes.create_string_buffer(b'', EMTM_MAX_CHARS)),
-        ('str_code', ctypes.create_string_buffer(b'', EMTM_MAX_CHARS)),
-        ('str_number', ctypes.create_string_buffer(b'', EMTM_MAX_CHARS)),
-        ('str_stage', ctypes.create_string_buffer(b'', EMTM_MAX_CHARS)),
-        ('str_activity', ctypes.create_string_buffer(b'', EMTM_MAX_CHARS)),
-        ('str_comment', ctypes.create_string_buffer(b'', EMTM_MAX_CHARS)),
-        ('str_att_9', ctypes.create_string_buffer(b'', EMTM_MAX_CHARS)),
-        ('str_att_10', ctypes.create_string_buffer(b'', EMTM_MAX_CHARS))
-    }
+        ('str_family', ctypes.c_char * EMTM_MAX_CHARS),
+        ('str_genus', ctypes.c_char * EMTM_MAX_CHARS),
+        ('str_species', ctypes.c_char * EMTM_MAX_CHARS),
+        ('str_code', ctypes.c_char * EMTM_MAX_CHARS),
+        ('str_number', ctypes.c_char * EMTM_MAX_CHARS),
+        ('str_stage', ctypes.c_char * EMTM_MAX_CHARS),
+        ('str_activity', ctypes.c_char * EMTM_MAX_CHARS),
+        ('str_comment', ctypes.c_char * EMTM_MAX_CHARS),
+        ('str_att_9', ctypes.c_char * EMTM_MAX_CHARS),
+        ('str_att_10', ctypes.c_char * EMTM_MAX_CHARS)
+    ]
 
     def __int__(self, str_op_code,
                 str_filename_left, str_filename_right,
@@ -281,21 +283,21 @@ class EmPointData(ctypes.Structure):
     """
     Point structures used by libEMTLib.so from SeaGIS
     """
-    _fields_ = {
-        ('str_filename', ctypes.create_string_buffer(b'', EMTM_MAX_CHARS)),
+    _fields_ = [
+        ('str_filename', ctypes.c_char * EMTM_MAX_CHARS),
         ('n_frame', ctypes.c_int),
         ('d_time_mins', ctypes.c_double),
         ('d_image_row', ctypes.c_double),
         ('d_image_col', ctypes.c_double),
-        ('str_att_1', ctypes.create_string_buffer(b'', EMTM_MAX_CHARS)),
-        ('str_att_2', ctypes.create_string_buffer(b'', EMTM_MAX_CHARS)),
-        ('str_att_3', ctypes.create_string_buffer(b'', EMTM_MAX_CHARS)),
-        ('str_att_4', ctypes.create_string_buffer(b'', EMTM_MAX_CHARS)),
-        ('str_att_5', ctypes.create_string_buffer(b'', EMTM_MAX_CHARS)),
-        ('str_att_6', ctypes.create_string_buffer(b'', EMTM_MAX_CHARS)),
-        ('str_att_7', ctypes.create_string_buffer(b'', EMTM_MAX_CHARS)),
-        ('str_att_8', ctypes.create_string_buffer(b'', EMTM_MAX_CHARS))
-    }
+        ('str_att_1', ctypes.c_char * EMTM_MAX_CHARS),
+        ('str_att_2', ctypes.c_char * EMTM_MAX_CHARS),
+        ('str_att_3', ctypes.c_char * EMTM_MAX_CHARS),
+        ('str_att_4', ctypes.c_char * EMTM_MAX_CHARS),
+        ('str_att_5', ctypes.c_char * EMTM_MAX_CHARS),
+        ('str_att_6', ctypes.c_char * EMTM_MAX_CHARS),
+        ('str_att_7', ctypes.c_char * EMTM_MAX_CHARS),
+        ('str_att_8', ctypes.c_char * EMTM_MAX_CHARS)
+    ]
 
     def __int__(self,
                 str_filename,
@@ -318,3 +320,21 @@ class EmPointData(ctypes.Structure):
         self.str_att_6 = str_att_6
         self.str_att_7 = str_att_7
         self.str_att_8 = str_att_8
+
+
+def emtm_version() -> tuple[int, int]:
+    """
+    Return the version number of libStereoLibLX
+    :return: (major, minor)
+    """
+
+    pminor = ctypes.POINTER(ctypes.c_int)
+    pmajor = ctypes.POINTER(ctypes.c_int)
+    libc.EMTMVersion.argtypes = [pminor, pmajor]
+
+    minor = ctypes.c_int(0)
+    major = ctypes.c_int(0)
+
+    libc.EMTMVersion(major, minor)
+
+    return major.value, minor.value
