@@ -275,3 +275,46 @@ class EmLengthData(ctypes.Structure):
         self.str_comment = str_comment
         self.str_att_9 = str_att_9
         self.str_att_10 = str_att_10
+
+
+class EmPointData(ctypes.Structure):
+    """
+    Point structures used by libEMTLib.so from SeaGIS
+    """
+    _fields_ = {
+        ('str_filename', ctypes.create_string_buffer(b'', EMTM_MAX_CHARS)),
+        ('n_frame', ctypes.c_int),
+        ('d_time_mins', ctypes.c_double),
+        ('d_image_row', ctypes.c_double),
+        ('d_image_col', ctypes.c_double),
+        ('str_att_1', ctypes.create_string_buffer(b'', EMTM_MAX_CHARS)),
+        ('str_att_2', ctypes.create_string_buffer(b'', EMTM_MAX_CHARS)),
+        ('str_att_3', ctypes.create_string_buffer(b'', EMTM_MAX_CHARS)),
+        ('str_att_4', ctypes.create_string_buffer(b'', EMTM_MAX_CHARS)),
+        ('str_att_5', ctypes.create_string_buffer(b'', EMTM_MAX_CHARS)),
+        ('str_att_6', ctypes.create_string_buffer(b'', EMTM_MAX_CHARS)),
+        ('str_att_7', ctypes.create_string_buffer(b'', EMTM_MAX_CHARS)),
+        ('str_att_8', ctypes.create_string_buffer(b'', EMTM_MAX_CHARS))
+    }
+
+    def __int__(self,
+                str_filename,
+                n_frame,
+                d_time_mins,
+                d_image_row,
+                d_image_col,
+                str_att_1, str_att_2, str_att_3, str_att_4, str_att_5, str_att_6, str_att_7, str_att_8):
+        super().__init__()
+        self.str_filename = str_filename
+        self.n_frame = n_frame
+        self.d_time_mins = d_time_mins
+        self.d_image_row = d_image_row
+        self.d_image_col = d_image_col
+        self.str_att_1 = str_att_1
+        self.str_att_2 = str_att_2
+        self.str_att_3 = str_att_3
+        self.str_att_4 = str_att_4
+        self.str_att_5 = str_att_5
+        self.str_att_6 = str_att_6
+        self.str_att_7 = str_att_7
+        self.str_att_8 = str_att_8
