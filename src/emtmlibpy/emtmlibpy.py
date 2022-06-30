@@ -9,7 +9,7 @@ EMTM_MAX_CHARS = 1024
 libc = ctypes.CDLL('./emtmlibpy/libEMTMLib.so')
 
 
-class Result(IntEnum):
+class EMTMResult(IntEnum):
     """
     libStereoLibLX returns result codes.  This enumerates the codes.
     """
@@ -338,3 +338,75 @@ def emtm_version() -> tuple[int, int]:
     libc.EMTMVersion(major, minor)
 
     return major.value, minor.value
+
+
+def emtm_licence_present() -> bool:
+    """
+    Checks to see if there is a valid licence present
+    :return:
+    """
+    r = libc.EMTMLicencePresent()
+
+    return True if r == 1 else False
+
+
+def em_load_data(filename: str) -> EMTMResult:
+    """
+    The EventMeasure data file (.EMObs) to load
+
+    Use this function to load an EventMeasure data file.
+    The EventMeasure data loaded with this function remains persistent
+    within the library until a subsequent call to this function is made, or the
+    data is specifically cleared by calling `EMClearData`.
+
+    Essentially all remaining functions that deal with EventMeasure data rely
+    on this function to load the actual data.
+
+    You do not need to call `EMClearData` before calling this function.
+
+    :param filename:
+    :return: EMTMResult
+    """
+    return libc.EMLoadData(bytes(filename, 'UTF-8'))
+
+
+def em_clear_data() -> None:
+    """
+    Use this function to clear data loaded with EMLoadData. The only reason to
+    use this function is to specifically release resources used to store the
+    current EventMeasure data. Those resources are automatically released
+    when the library goes out of scope, or EMLoadData is used to load other
+    EventMeasure data.
+
+    :return: None
+    """
+    libc.EMClearData()
+
+
+def em_op_code(n_buff_sz: int = EMTM_MAX_CHARS) -> EMTMResult:
+    """
+    Use this function to get the OpCode of the currently loaded EventMeasure
+    data. The EventMeasure data is loaded using EMLoadData.
+
+    :param p_str_op_code: Address of the buffer to receive the OpCode string. The caller is
+    responsible for allocating enough space for at least nBuffSz
+    characters in this buffer.
+    :param n_buff_sz: The size of the buffer (pStrOpCode)
+    :return: Will return buffer_too_small if the OpCode will not fit in the
+    supplied buffer, ok for success.
+    """
+
+    op_code = ctypes.create_string_buffer(EMTM_MAX_CHARS)
+
+    libc.EMOpCode(ctypes.byref(op_code), n_buff_sz)
+
+    return op_code.value
+
+
+def em_units(p_str_units: str, n_buff_sz: int) -> EMTMResult:
+    """
+
+    :param p_str_units:
+    :param n_buff_sz:
+    :return:
+    """
