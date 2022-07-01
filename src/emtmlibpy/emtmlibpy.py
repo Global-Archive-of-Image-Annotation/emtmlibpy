@@ -584,3 +584,46 @@ def em_get_point(n_index: int) -> EmPointData:
     r = libc.EMGetPoint(n_index, ctypes.byref(p))
 
     return p
+
+def em_3d_point_count() -> int:
+    """
+    Use this function to find the number of 3D point measurements in the
+    currently loaded EventMeasure data.
+    EventMeasure data is loaded using EMLoadData.
+    This function must be called before calling EMGet3DPoint for two reasons:
+    • Calling this function generates an indexed mapping of all 3D point
+    measurements in the currently loaded EventMeasure data. The
+    library stores this mapping internally until a new EventMeasure data
+    file is loaded (EMLoadData) or the current EventMeasure data is
+    specifically cleared (EMClearData).
+    • The return value of this function is the upper bound of the indices
+    allowed by EMGet3DPoint.
+    It is sufficient to call this function once before making multiple calls to
+    EMGet3DPoint
+
+    :return: number of 3D points
+    """
+
+    r = libc.EM3DPointCount()
+    return r
+
+def em_get_3d_point(n_index: int) -> Em3DPpointData:
+    """
+    Use this function to get 3D point measurement data for a measurement in
+    the currently loaded EventMeasure data.
+    Before using this function:
+    • There must be EventMeasure data loaded using EMLoadData.
+    • You must call EM3DPointCount to discover the upper bound for this
+    function’s nIndex parameter.
+    If the function returns buffer_too_small, the string buffers in the
+    EM3DPointData structure will be filled to their allowed capacity, then the
+    string data is truncated to avoid overflow.
+    :param n_index:
+    :return:
+    """
+
+    xyz_point = Em3DPpointData()
+
+    r = libc.EMGet3DPoint(n_index, ctypes.byref(xyz_point))
+
+    return xyz_point

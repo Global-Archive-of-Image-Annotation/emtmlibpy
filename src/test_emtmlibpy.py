@@ -81,6 +81,8 @@ class TestEmtmlibpy(unittest.TestCase):
         PointCount = namedtuple('PointCount', 'total bbox')
         self.assertTupleEqual(r, PointCount(total=35, bbox=4))
 
+
+
     def test_em_get_point(self):
         r = emtm.em_load_data(os.path.join(TEST_FILES_PATH, 'Test.EMObs'))
         point_count = emtm.em_point_count()
@@ -92,10 +94,36 @@ class TestEmtmlibpy(unittest.TestCase):
         print(em_point_fields)
 
         for ii in range(point_count.total):
+            em_point_values = []
+            p = emtm.em_get_point(ii)
+            for fields in em_point_fields:
+                em_point_values.append(p.__getattribute__(fields))
+
+            print(em_point_values)  # just so we can get the fields
+
+
+
+
+
+    def test_em_3d_point_count(self):
+        r = emtm.em_load_data(os.path.join(TEST_FILES_PATH, 'Test.EMObs'))
+        r = emtm.em_3d_point_count()
+        self.assertEqual(r, 2)
+
+    def test_em_get_3d_point(self):
+        r = emtm.em_load_data(os.path.join(TEST_FILES_PATH, 'Test.EMObs'))
+        point_count = emtm.em_3d_point_count()
+        print(point_count)
+        p = emtm.em_get_3d_point(0)  # just so we can get the fields
+
+        em_point_values = []
+        em_point_fields = [field[0] for field in p._fields_]
+        print(em_point_fields)
+
+        for ii in range(point_count):
+            em_point_values = []
+            p = emtm.em_get_3d_point(ii)
             for fields in em_point_fields:
                 em_point_values.append(p.__getattribute__(fields))
 
             print(em_point_values)
-
-
-
