@@ -280,7 +280,7 @@ class EmLengthData(ctypes.Structure):
         self.str_att_10 = str_att_10
 
 
-class EmPointData(ctypes.Structure):
+class TmPointData(ctypes.Structure):
     """
     Point structures used by libEMTLib.so from SeaGIS
     """
@@ -534,3 +534,53 @@ def em_measurement_count_fgs(family: str, genus: str, species: str) -> tuple:
     fgs = FGS(n_point.value, n_box.value, n_3D_point.value, n_length.value, n_cpd_length.value)
 
     return fgs
+
+def em_point_count() -> tuple:
+    """
+    Use this function to find the number of point measurements (including
+    bounding boxes) in the currently loaded EventMeasure data.
+    EventMeasure data is loaded using EMLoadData.
+
+    This function must be called before calling EMGetPoint for two reasons:
+    • Calling this function generates an indexed mapping of all point
+    measurements in the currently loaded EventMeasure data. The
+    library stores this mapping internally until a new EventMeasure data
+    file is loaded (EMLoadData) or the current EventMeasure data is
+    specifically cleared (EMClearData).
+
+    • The return value of this function is the upper bound of the indices
+    allowed by EMGetPoint.
+
+    It is sufficient to call this function once before making multiple calls to
+    EMGetPoint.
+    :return:
+    """
+
+    pn_bbox = ctypes.c_int(0)
+    r = libc.EMPointCount(ctypes.byref(pn_bbox))
+
+    PointCount = namedtuple('PointCount', 'total bbox')
+    point_count = PointCount(r, pn_bbox.value)
+
+    return point_count
+
+def em_get_point(n_index: int) -> EmPointData:
+    """
+    Use this function to get point measurement data (including bounding box
+    data) for a measurement in the currently loaded EventMeasure data.
+    Before using this function:
+    • There must be EventMeasure data loaded using EMLoadData.
+    • You must call EMPointCount to discover the upper bound for this
+    function’s nIndex parameter.
+    If the function returns buffer_too_small, the string buffers in the
+    EMPointData structure will be filled to their allowed capacity, then the
+    string data is truncated to avoid overflow
+    :param n_index:
+    :return:
+    """
+
+    p = EmPointData()
+
+    r = libc.EMGetPoint(n_index, ctypes.byref(p))
+
+    return p

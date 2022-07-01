@@ -2,6 +2,7 @@ import unittest
 import os
 import emtmlibpy.emtmlibpy as emtm
 from emtmlibpy.emtmlibpy import EMTMResult
+from collections import namedtuple
 
 SRC_DIR = os.path.abspath(os.path.dirname(__file__))
 TEST_FILES_PATH = os.path.join(SRC_DIR, 'test_files')
@@ -59,7 +60,42 @@ class TestEmtmlibpy(unittest.TestCase):
             self.assertTupleEqual(r, fgs[ii])
 
     def test_em_measurement_count_fgs(self):
+        FGS = namedtuple('FGS', 'point box xyz_point, length cpd_length')
 
         r = emtm.em_measurement_count_fgs('balistidae', 'abalistes', 'stellatus')
-        print(r)
+        self.assertTupleEqual(r, FGS(point=6, box=1, xyz_point=0, length=4, cpd_length=0))
+
+        r = emtm.em_measurement_count_fgs('*', '*', '*')
+        self.assertTupleEqual(r, FGS(point=31, box=4, xyz_point=2, length=21, cpd_length=1))
+
+        r = emtm.em_measurement_count_fgs('nemipteridae', '*', '*')
+        self.assertTupleEqual(r, FGS(point=14, box=2, xyz_point=1, length=14, cpd_length=0))
+
+        r = emtm.em_measurement_count_fgs('*', '*', 'furcosus')
+        self.assertTupleEqual(r, FGS(point=6, box=0, xyz_point=1, length=4, cpd_length=0))
+
+    def test_em_point_count(self):
+        r = emtm.em_load_data(os.path.join(TEST_FILES_PATH, 'Test.EMObs'))
+
+        r = emtm.em_point_count()
+        PointCount = namedtuple('PointCount', 'total bbox')
+        self.assertTupleEqual(r, PointCount(total=35, bbox=4))
+
+    def test_em_get_point(self):
+        r = emtm.em_load_data(os.path.join(TEST_FILES_PATH, 'Test.EMObs'))
+        point_count = emtm.em_point_count()
+        print(point_count)
+        p = emtm.em_get_point(0)  # just so we can get the fields
+
+        em_point_values = []
+        em_point_fields = [field[0] for field in p._fields_]
+        print(em_point_fields)
+
+        for ii in range(point_count.total):
+            for fields in em_point_fields:
+                em_point_values.append(p.__getattribute__(fields))
+
+            print(em_point_values)
+
+
 
