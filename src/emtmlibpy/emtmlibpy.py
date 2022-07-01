@@ -4,6 +4,7 @@ Requires a licence to use, this is just a python wrapping function
 """
 import ctypes
 from enum import IntEnum, auto
+from collections import namedtuple
 
 EMTM_MAX_CHARS = 1024
 libc = ctypes.CDLL('./emtmlibpy/libEMTMLib.so')
@@ -383,7 +384,7 @@ def em_clear_data() -> None:
     libc.EMClearData()
 
 
-def em_op_code(n_buff_sz: int = EMTM_MAX_CHARS) -> EMTMResult:
+def em_op_code(n_buff_sz: int = EMTM_MAX_CHARS) -> str:
     """
     Use this function to get the OpCode of the currently loaded EventMeasure
     data. The EventMeasure data is loaded using EMLoadData.
@@ -396,17 +397,140 @@ def em_op_code(n_buff_sz: int = EMTM_MAX_CHARS) -> EMTMResult:
     supplied buffer, ok for success.
     """
 
-    op_code = ctypes.create_string_buffer(EMTM_MAX_CHARS)
+    op_code = ctypes.create_string_buffer(n_buff_sz)
 
     libc.EMOpCode(ctypes.byref(op_code), n_buff_sz)
 
     return op_code.value
 
 
-def em_units(p_str_units: str, n_buff_sz: int) -> EMTMResult:
+def em_units(n_buff_sz: int = EMTM_MAX_CHARS) -> str:
+    """
+    Use this function to get the 3D measurement units for the currently loaded
+    EventMeasure data. The EventMeasure data is loaded using EMLoadData
+
+    :param p_str_units: Address of the buffer to receive the units string. The caller is
+    responsible for allocating enough space for at least nBuffSz
+    characters in this buffer.
+    :param n_buff_sz: The size of the buffer (pStrUnits).
+    :return: Will return buffer_too_small if the units string will not fit in the
+    supplied buffer, ok for success.
     """
 
-    :param p_str_units:
-    :param n_buff_sz:
+    p_str_units = ctypes.create_string_buffer(n_buff_sz)
+
+    libc.EMUnits(ctypes.byref(p_str_units))
+
+    return p_str_units.value
+
+
+def em_unique_fgs() -> int:
+    """
+    Use this function to find the number of unique family, genus, species
+    combinations present in all measurements in the currently loaded
+    EventMeasure data. All measurement types are considered (points,
+    bounding boxes, 3D points and lengths).
+    EventMeasure data is loaded using EMLoadData.
+    This function must be called before calling EMGetUniqueFGS for two
+    reasons:
+    • Calling EMUniqueFGS generates a list of unique family, genus, species
+    values for the currently loaded EventMeasure data. The library stores
+    this list until a new EventMeasure data file is loaded (EMLoadData) or
+    the current EventMeasure data is specifically cleared (EMClearData).
+    • EMUniqueFGS returns the number of family, genus, species names
+    that can be queried using EMGetUniqueFGS.
+    It is sufficient to call this function (EMUniqueFGS) once before making
+    multiple calls to EMGetUniqueFGS.
+
     :return:
     """
+    return libc.EMUniqueFGS()
+
+
+def em_get_unique_fgs(n_index: int) -> tuple:
+    """
+    Before using this function:
+    • There must be EventMeasure data loaded using EMLoadData.
+    • You must call EMUniqueFGS to discover the number of unique family,
+    genus, species combinations – this provides the upper bound for this
+    function’s nIndex parameter.
+    The returned family, genus, species strings will always be lower case,
+    regardless of how they were originally stored in the EventMeasure data.
+    It is possible (valid) for this function to return empty strings (“”) for the
+    family, genus, species. An EventMeasure user may only annotate to the
+    family level (so the genus and species are empty), or a user may not
+    annotate the family, genus, species at all (for example an annotation or
+    measurement that just has a comment attribute).
+    The caller is responsible for allocating and deleting the buffers associated
+    with the strings pStrFamily, pStrGenus, pStrSpecies; and ensuring the
+    buffers are at least nBuffSz characters in size.
+    Family, genus, species has some sample test data.
+    :return: 
+    """
+
+    n_index = ctypes.c_int(n_index)
+
+    p_str_family = ctypes.create_string_buffer(EMTM_MAX_CHARS)
+    p_str_genus = ctypes.create_string_buffer(EMTM_MAX_CHARS)
+    p_str_species = ctypes.create_string_buffer(EMTM_MAX_CHARS)
+
+    success = libc.EMGetUniqueFGS(n_index,
+                                  ctypes.byref(p_str_family), ctypes.byref(p_str_genus), ctypes.byref(p_str_species),
+                                  EMTM_MAX_CHARS)
+
+    return p_str_family.value, p_str_genus.value, p_str_species.value
+
+
+def em_measurement_count_fgs(family: str, genus: str, species: str) -> tuple:
+    """
+    Use this function to query the number of measurements present in the
+    currently loaded EventMeasure data, for a specified family/genus/species.
+    The EventMeasure data is loaded using EMLoadData.
+
+    The pStrFamily, pStrGenus, pStrSpecies arguments are used to
+    query the measurement count for a specific family/genus/species.
+
+    Specification of the family/genus/species is case insensitive.
+
+    A wildcard “*” can be used to ignore a family/genus/species argument. For
+    example, to count measurements for species ghi for any family and genus
+
+    the first three arguments of the function call are:
+    EMMeasurementCountFGS(“*”, “*”, “ghi”, ...);
+
+    The family/genus/species arguments are case insensitive, so the following
+
+    gives an identical result:
+    EMMeasurementCountFGS(“*”, “*”, “GHI”, ...);
+
+    To count measurements for family abc, genus def, species ghi the first
+
+    three arguments of the function call are:
+    EMMeasurementCountFGS(“abc”, “def”, “ghi”, ...);
+
+    :param family: The family to use when counting measurements, see examples
+    below.
+    :param genus: The genus to use when counting measurements.
+    :param species: The species to use when counting measurements.
+    :return: (n_point, n_box, n_3D_point, n_length, n_cpd_length)
+    """
+
+    n_point = ctypes.c_int(0)
+    n_box = ctypes.c_int(0)
+    n_3D_point = ctypes.c_int(0)
+    n_length = ctypes.c_int(0)
+    n_cpd_length = ctypes.c_int(0)
+
+    libc.EMMeasurementCountFGS(bytes(family, 'UTF-8'),
+                               bytes(genus, 'UTF-8'),
+                               bytes(species, 'UTF-8'),
+                               ctypes.byref(n_point),
+                               ctypes.byref(n_box),
+                               ctypes.byref(n_3D_point),
+                               ctypes.byref(n_length),
+                               ctypes.byref(n_cpd_length))
+
+    FGS = namedtuple('FGS', 'point box xyz_point, length cpd_length')
+    fgs = FGS(n_point.value, n_box.value, n_3D_point.value, n_length.value, n_cpd_length.value)
+
+    return fgs
