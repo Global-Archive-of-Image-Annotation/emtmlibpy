@@ -535,6 +535,7 @@ def em_measurement_count_fgs(family: str, genus: str, species: str) -> tuple:
 
     return fgs
 
+
 def em_point_count() -> tuple:
     """
     Use this function to find the number of point measurements (including
@@ -564,6 +565,7 @@ def em_point_count() -> tuple:
 
     return point_count
 
+
 def em_get_point(n_index: int) -> EmPointData:
     """
     Use this function to get point measurement data (including bounding box
@@ -584,6 +586,7 @@ def em_get_point(n_index: int) -> EmPointData:
     r = libc.EMGetPoint(n_index, ctypes.byref(p))
 
     return p
+
 
 def em_3d_point_count() -> int:
     """
@@ -607,6 +610,7 @@ def em_3d_point_count() -> int:
     r = libc.EM3DPointCount()
     return r
 
+
 def em_get_3d_point(n_index: int) -> Em3DPpointData:
     """
     Use this function to get 3D point measurement data for a measurement in
@@ -627,3 +631,144 @@ def em_get_3d_point(n_index: int) -> Em3DPpointData:
     r = libc.EMGet3DPoint(n_index, ctypes.byref(xyz_point))
 
     return xyz_point
+
+
+def em_get_length_count() -> tuple:
+    """
+    Use this function to find the number of length measurements (including
+    compound lengths) in the currently loaded EventMeasure data.
+    EventMeasure data is loaded using EMLoadData.
+    This function must be called before calling EMGetLength for two reasons:
+    • Calling this function generates an indexed mapping of all length
+    measurements in the currently loaded EventMeasure data. The
+    library stores this mapping internally until a new EventMeasure data
+    file is loaded (EMLoadData) or the current EventMeasure data is
+    specifically cleared (EMClearData).
+    • The return value of this function is the upper bound of the indices
+    allowed by EMGetLength.
+    It is sufficient to call this function once before making multiple calls to
+    EMGetLength.
+    :return: The count of length measurements. This includes any compound
+    length measurements (that is, the return value is the total number of
+    length and compound length measurements). Use pnCompound to
+    find the number of compound lengths
+    """
+
+    pn_compound = ctypes.c_int(0)
+
+    r = libc.EMLengthCount(pn_compound)
+
+    LengthCount = namedtuple('LengthCount', 'total compound')
+    length_count = LengthCount(r, pn_compound.value)
+
+    return length_count
+
+
+def em_get_length(n_index: int) -> EmLengthData:
+    """
+    Use this function to get length measurement data (including compound
+    length data) for a measurement in the currently loaded EventMeasure
+    data.
+    Before using this function:
+    • There must be EventMeasure data loaded using EMLoadData.
+    • You must call EMLengthCount to discover the upper bound for this
+    function’s nIndex parameter.
+    If the function returns buffer_too_small, the string buffers in the
+    EMLengthData structure will be filled to their allowed capacity, then the
+    string data is truncated to avoid overflow.
+
+    :param n_index: The 0-based index of the required measurement. This value must be
+    ≥ 0, and < the value returned by EMLengthCount.
+    :return:
+    """
+
+    length_data = EmLengthData()
+
+    r = libc.EMGetLength(n_index, ctypes.byref(length_data))
+
+    return length_data
+
+
+def tm_load_data(filename: str) -> EMTMResult:
+    """
+    Use this function to load a TransectMeasure data file.
+    The TransectMeasure data loaded with this function remains persistent
+    within the library until a subsequent call to this function is made, or the
+    data is specifically cleared by calling TMClearData.
+
+    Essentially all remaining functions that deal with TransectMeasure data
+    rely on this function to load the actual data.
+
+    You do not need to call TMClearData before calling this function.
+
+    :param filename: The TransectMeasure data file (.TMObs) to load.
+    :return: Will return invalid_licence if the licence is invalid, failed if the
+    TransectMeasure data file (pStrFileName) cannot be read, ok if the
+    TransectMeasure data file was read successfully.
+
+    """
+
+    r = libc.TMLoadData(bytes(filename, 'UTF-8'))
+    return r
+
+
+def tm_clear_data() -> None:
+    """
+    Use this function to clear data loaded with TMLoadData . The only reason to
+    use this function is to specifically release resources used to store the
+    current TransectMeasure data. Those resources are automatically released
+    when the library goes out of scope, or TMLoadData is used to load other
+    TransectMeasure data.
+
+    :return:
+    """
+
+    libc.TMClearData()
+
+
+def tm_point_count() -> int:
+    """
+    Use this function to find the number of point measurements in the
+    currently loaded TransectMeasure data.
+    TransectMeasure data is loaded using TMLoadData.
+    This function must be called before calling TMGetPoint for two reasons:
+
+    • Calling this function generates an indexed mapping of all point
+    measurements in the currently loaded TransectMeasure data. The
+    library stores this mapping internally until a new TransectMeasure
+    data file is loaded (TMLoadData) or the current TransectMeasure
+    data is specifically cleared (TMClearData).
+
+    • The return value of this function is the upper bound of the indices
+    allowed by TMGetPoint.
+
+    It is sufficient to call this function once before making multiple calls to
+    TMGetPoint.
+
+    :return: The count of point measurements.
+    """
+
+    return libc.TMPointCount()
+
+
+def tm_get_point(n_index) -> TmPointData:
+    """
+    Use this function to get point measurement data for a measurement in the
+    currently loaded TransectMeasure data.
+    Before using this function:
+    • There must be TransectMeasure data loaded using TMLoadData.
+    • You must call TMPointCount to discover the upper bound for this
+    function’s nIndex parameter.
+    If the function returns buffer_too_small , the string buffers in the
+    TMPointData structure will be filled to their allowed capacity, then the
+    string data is truncated to avoid overflow.
+
+
+    :param n_index:
+    :return:
+    """
+    p = TmPointData()
+
+    r = libc.TMGetPoint(n_index, ctypes.byref(p))
+
+    return p
