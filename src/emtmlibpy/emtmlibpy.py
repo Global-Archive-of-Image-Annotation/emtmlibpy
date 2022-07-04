@@ -430,15 +430,19 @@ def em_unique_fgs() -> int:
     combinations present in all measurements in the currently loaded
     EventMeasure data. All measurement types are considered (points,
     bounding boxes, 3D points and lengths).
+
     EventMeasure data is loaded using EMLoadData.
     This function must be called before calling EMGetUniqueFGS for two
     reasons:
+
     • Calling EMUniqueFGS generates a list of unique family, genus, species
     values for the currently loaded EventMeasure data. The library stores
     this list until a new EventMeasure data file is loaded (EMLoadData) or
     the current EventMeasure data is specifically cleared (EMClearData).
+
     • EMUniqueFGS returns the number of family, genus, species names
     that can be queried using EMGetUniqueFGS.
+
     It is sufficient to call this function (EMUniqueFGS) once before making
     multiple calls to EMGetUniqueFGS.
 
@@ -450,10 +454,13 @@ def em_unique_fgs() -> int:
 def em_get_unique_fgs(n_index: int) -> tuple:
     """
     Before using this function:
+
     • There must be EventMeasure data loaded using EMLoadData.
+
     • You must call EMUniqueFGS to discover the number of unique family,
     genus, species combinations – this provides the upper bound for this
     function’s nIndex parameter.
+
     The returned family, genus, species strings will always be lower case,
     regardless of how they were originally stored in the EventMeasure data.
     It is possible (valid) for this function to return empty strings (“”) for the
@@ -461,9 +468,11 @@ def em_get_unique_fgs(n_index: int) -> tuple:
     family level (so the genus and species are empty), or a user may not
     annotate the family, genus, species at all (for example an annotation or
     measurement that just has a comment attribute).
+
     The caller is responsible for allocating and deleting the buffers associated
     with the strings pStrFamily, pStrGenus, pStrSpecies; and ensuring the
     buffers are at least nBuffSz characters in size.
+
     Family, genus, species has some sample test data.
     :return: 
     """
@@ -543,6 +552,7 @@ def em_point_count() -> tuple:
     EventMeasure data is loaded using EMLoadData.
 
     This function must be called before calling EMGetPoint for two reasons:
+
     • Calling this function generates an indexed mapping of all point
     measurements in the currently loaded EventMeasure data. The
     library stores this mapping internally until a new EventMeasure data
@@ -571,9 +581,11 @@ def em_get_point(n_index: int) -> EmPointData:
     Use this function to get point measurement data (including bounding box
     data) for a measurement in the currently loaded EventMeasure data.
     Before using this function:
+
     • There must be EventMeasure data loaded using EMLoadData.
     • You must call EMPointCount to discover the upper bound for this
     function’s nIndex parameter.
+
     If the function returns buffer_too_small, the string buffers in the
     EMPointData structure will be filled to their allowed capacity, then the
     string data is truncated to avoid overflow
@@ -593,14 +605,18 @@ def em_3d_point_count() -> int:
     Use this function to find the number of 3D point measurements in the
     currently loaded EventMeasure data.
     EventMeasure data is loaded using EMLoadData.
+
     This function must be called before calling EMGet3DPoint for two reasons:
+
     • Calling this function generates an indexed mapping of all 3D point
     measurements in the currently loaded EventMeasure data. The
     library stores this mapping internally until a new EventMeasure data
     file is loaded (EMLoadData) or the current EventMeasure data is
     specifically cleared (EMClearData).
+
     • The return value of this function is the upper bound of the indices
     allowed by EMGet3DPoint.
+
     It is sufficient to call this function once before making multiple calls to
     EMGet3DPoint
 
@@ -615,10 +631,12 @@ def em_get_3d_point(n_index: int) -> Em3DPpointData:
     """
     Use this function to get 3D point measurement data for a measurement in
     the currently loaded EventMeasure data.
+
     Before using this function:
     • There must be EventMeasure data loaded using EMLoadData.
     • You must call EM3DPointCount to discover the upper bound for this
     function’s nIndex parameter.
+
     If the function returns buffer_too_small, the string buffers in the
     EM3DPointData structure will be filled to their allowed capacity, then the
     string data is truncated to avoid overflow.
@@ -638,14 +656,17 @@ def em_get_length_count() -> tuple:
     Use this function to find the number of length measurements (including
     compound lengths) in the currently loaded EventMeasure data.
     EventMeasure data is loaded using EMLoadData.
+
     This function must be called before calling EMGetLength for two reasons:
     • Calling this function generates an indexed mapping of all length
     measurements in the currently loaded EventMeasure data. The
     library stores this mapping internally until a new EventMeasure data
     file is loaded (EMLoadData) or the current EventMeasure data is
     specifically cleared (EMClearData).
+
     • The return value of this function is the upper bound of the indices
     allowed by EMGetLength.
+
     It is sufficient to call this function once before making multiple calls to
     EMGetLength.
     :return: The count of length measurements. This includes any compound
