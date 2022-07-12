@@ -1,5 +1,5 @@
 # emtmlibpy
-## Python wrapper for EMTLib for EventMeasure
+## Python wrapper for EMTMLib for EventMeasure
 
 To use you need a copy of `libEMTMLib.so` and valid licence to use it.  Available from https://www.seagis.com.au/
 ```bash
