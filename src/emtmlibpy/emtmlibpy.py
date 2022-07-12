@@ -7,7 +7,7 @@ from enum import IntEnum, auto
 from collections import namedtuple
 
 EMTM_MAX_CHARS = 1024
-libc = ctypes.CDLL('./emtmlibpy/libEMTMLib.so')
+libc = ctypes.CDLL('libEMTMLib.so')
 
 
 class EMTMResult(IntEnum):
@@ -49,21 +49,21 @@ class EmPointData(ctypes.Structure):
         ('str_att_10', ctypes.c_char * EMTM_MAX_CHARS)
     ]
 
-    def __int__(self, str_op_code,
-                str_filename,
-                n_frame,
-                d_time_mins,
-                str_period,
-                d_period_time_mins,
-                d_imx, d_imy,
-                d_rectx, d_recty,
-                str_family, str_genus, str_species,
-                str_code,
-                str_number,
-                str_stage,
-                str_activity,
-                str_comment,
-                str_att_9, str_att_10):
+    def __init__(self, str_op_code=b'',
+                str_filename=b'',
+                n_frame=0,
+                d_time_mins=0.0,
+                str_period=b'',
+                d_period_time_mins=0.0,
+                d_imx=0.0, d_imy=0.0,
+                d_rectx=0.0, d_recty=0.0,
+                str_family=b'', str_genus=b'', str_species=b'',
+                str_code=b'',
+                str_number=b'',
+                str_stage=b'',
+                str_activity=b'',
+                str_comment=b'',
+                str_att_9=b'', str_att_10=b''):
         super().__init__()
         self.str_op_code = str_op_code
         self.str_filename = str_filename
@@ -125,25 +125,25 @@ class Em3DPpointData(ctypes.Structure):
         ('str_att_10', ctypes.c_char * EMTM_MAX_CHARS)
     ]
 
-    def __int__(self, str_op_code,
-                str_filename_left, str_filename_right,
-                n_frame_left, n_frame_right,
-                d_time_mins,
-                str_period,
-                d_period_time_mins,
-                d_imx_left, d_imy_left, d_imx_right, d_imy_right,
-                dx, dy, dz,
-                dsx, dsy, dsz,
-                d_rms,
-                d_range,
-                d_direction,
-                str_family, str_genus, str_species,
-                str_code,
-                str_number,
-                str_stage,
-                str_activity,
-                str_comment,
-                str_att_9, str_att_10):
+    def __init__(self, str_op_code=b'',
+                str_filename_left=b'', str_filename_right=b'',
+                n_frame_left=0, n_frame_right=0,
+                d_time_mins=0.0,
+                str_period=b'',
+                d_period_time_mins=0.0,
+                d_imx_left=0.0, d_imy_left=0.0, d_imx_right=0.0, d_imy_right=0.0,
+                dx=0.0, dy=0.0, dz=0.0,
+                dsx=0.0, dsy=0.0, dsz=0.0,
+                d_rms=0.0,
+                d_range=0.0,
+                d_direction=0.0,
+                str_family=b'', str_genus=b'', str_species=b'',
+                str_code=b'',
+                str_number=b'',
+                str_stage=b'',
+                str_activity=b'',
+                str_comment=b'',
+                str_att_9=b'', str_att_10=b''):
         super().__init__()
         self.str_op_code = str_op_code
         self.str_filename_left = str_filename_left
@@ -220,28 +220,28 @@ class EmLengthData(ctypes.Structure):
         ('str_att_10', ctypes.c_char * EMTM_MAX_CHARS)
     ]
 
-    def __int__(self, str_op_code,
-                str_filename_left, str_filename_right,
-                n_frame_left, n_frame_right,
-                d_time_mins,
-                str_period,
-                d_period_time_mins,
-                b_compound_length,
-                d_imx1_left, d_imy1_left, d_imx1_right, d_imy1_right,
-                d_imx2_left, d_imy2_left, d_imx2_right, d_imy2_right,
-                d_length,
-                d_precision,
-                d_rms,
-                d_range,
-                d_direction,
-                dx_mid, dy_mid, dz_mid,
-                str_family, str_genus, str_species,
-                str_code,
-                str_number,
-                str_stage,
-                str_activity,
-                str_comment,
-                str_att_9, str_att_10):
+    def __init__(self, str_op_code=b'',
+                str_filename_left=b'', str_filename_right=b'',
+                n_frame_left=0, n_frame_right=0,
+                d_time_mins=0.0,
+                str_period=b'',
+                d_period_time_mins=0.0,
+                b_compound_length=0.0,
+                d_imx1_left=0.0, d_imy1_left=0.0, d_imx1_right=0.0, d_imy1_right=0.0,
+                d_imx2_left=0.0, d_imy2_left=0.0, d_imx2_right=0.0, d_imy2_right=0.0,
+                d_length=0.0,
+                d_precision=0.0,
+                d_rms=0.0,
+                d_range=0.0,
+                d_direction=0.0,
+                dx_mid=0.0, dy_mid=0.0, dz_mid=0.0,
+                str_family=b'', str_genus=b'', str_species=b'',
+                str_code=b'',
+                str_number=b'',
+                str_stage=b'',
+                str_activity=b'',
+                str_comment=b'',
+                str_att_9=b'', str_att_10=b''):
         super().__init__()
         self.str_op_code = str_op_code
         self.str_filename_left = str_filename_left
@@ -300,13 +300,14 @@ class TmPointData(ctypes.Structure):
         ('str_att_8', ctypes.c_char * EMTM_MAX_CHARS)
     ]
 
-    def __int__(self,
-                str_filename,
-                n_frame,
-                d_time_mins,
-                d_image_row,
-                d_image_col,
-                str_att_1, str_att_2, str_att_3, str_att_4, str_att_5, str_att_6, str_att_7, str_att_8):
+    def __init__(self,
+                str_filename=b'',
+                n_frame=0,
+                d_time_mins=0.0,
+                d_image_row=0.0,
+                d_image_col=0.0,
+                str_att_1=b'', str_att_2=b'', str_att_3=b'', str_att_4=b'', str_att_5=b'', str_att_6=b'', str_att_7=b'',
+                str_att_8=b''):
         super().__init__()
         self.str_filename = str_filename
         self.n_frame = n_frame
@@ -329,14 +330,10 @@ def emtm_version() -> tuple[int, int]:
     :return: (major, minor)
     """
 
-    pminor = ctypes.POINTER(ctypes.c_int)
-    pmajor = ctypes.POINTER(ctypes.c_int)
-    libc.EMTMVersion.argtypes = [pminor, pmajor]
-
     minor = ctypes.c_int(0)
     major = ctypes.c_int(0)
 
-    libc.EMTMVersion(major, minor)
+    libc.EMTMVersion(ctypes.byref(major), ctypes.byref(minor))
 
     return major.value, minor.value
 
