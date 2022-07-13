@@ -26,7 +26,6 @@ class EmPointData(ctypes.Structure):
     Point structures used by libEMTLib.so from SeaGIS
     """
     _fields_ = [
-        # ('str_op_code', ctypes.c_char * EMTM_MAX_CHARS)),
         ('str_op_code', ctypes.c_char * EMTM_MAX_CHARS),
         ('str_filename', ctypes.c_char * EMTM_MAX_CHARS),
         ('n_frame', ctypes.c_int),
