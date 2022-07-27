@@ -177,3 +177,9 @@ class TestEmtmlibpy(unittest.TestCase):
                 tm_point_values.append(p.__getattribute__(fields))
 
             # print(tm_point_values)
+
+    def test_em_to_dataframe(self):
+        emtm.em_load_data(os.path.join(TEST_FILES_PATH, 'Test.EMObs'))
+        length_dataframe = emtm.em_to_dataframe(em_data_type='length')
+        point_dataframe = emtm.em_to_dataframe(em_data_type='point')
+
