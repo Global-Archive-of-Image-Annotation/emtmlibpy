@@ -5,6 +5,8 @@ Requires a licence to use, this is just a python wrapping function
 import ctypes
 from enum import IntEnum, auto
 from collections import namedtuple
+import pandas as pd
+import numpy as np
 
 EMTM_MAX_CHARS = 1024
 libc = ctypes.CDLL('libEMTMLib.so')
@@ -789,3 +791,34 @@ def tm_get_point(n_index) -> TmPointData:
     r = libc.TMGetPoint(n_index, ctypes.byref(p))
 
     return p
+
+def em_to_dataframe(em_data_type='length'):
+    """
+    A convenience method for returning a data fram instead of ctypes object.
+
+    :param em_data_type: Either length or point
+    :return: pandas dataframe
+    """
+    dtype_template = 'object'
+    if 'length' in em_data_type:
+        count = em_get_length_count().total
+        p = em_get_length(0)
+    elif 'point' in em_data_type:
+        count = em_point_count().total
+        p = em_get_point(0)
+
+    index = [attr for attr in dir(p) if (not attr.startswith('__') and not attr.startswith('_'))]
+    data = np.empty(shape=[count, len(index)], dtype=dtype_template)  # change these
+
+    for jj in range(count):
+        if 'length' in em_data_type:
+            p = em_get_length(jj)
+        elif 'point' in em_data_type:
+            p = em_get_point(jj)
+        for ii, ind in enumerate(index):
+            tmp = p.__getattribute__(ind)
+            data[jj][ii] = tmp
+
+    xpdf = pd.DataFrame(data=data, columns=index)
+    xpdf = xpdf.convert_dtypes().infer_objects()
+    return xpdf
