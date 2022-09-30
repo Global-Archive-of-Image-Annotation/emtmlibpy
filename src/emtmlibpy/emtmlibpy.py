@@ -399,7 +399,7 @@ def em_op_code(n_buff_sz: int = EMTM_MAX_CHARS) -> str:
 
     libc.EMOpCode(ctypes.byref(op_code), n_buff_sz)
 
-    return op_code.value
+    return op_code.value.decode()
 
 
 def em_units(n_buff_sz: int = EMTM_MAX_CHARS) -> str:
@@ -419,7 +419,7 @@ def em_units(n_buff_sz: int = EMTM_MAX_CHARS) -> str:
 
     libc.EMUnits(ctypes.byref(p_str_units))
 
-    return p_str_units.value
+    return p_str_units.value.decode()
 
 
 def em_unique_fgs() -> int:
@@ -485,7 +485,7 @@ def em_get_unique_fgs(n_index: int) -> tuple:
                                   ctypes.byref(p_str_family), ctypes.byref(p_str_genus), ctypes.byref(p_str_species),
                                   EMTM_MAX_CHARS)
 
-    return p_str_family.value, p_str_genus.value, p_str_species.value
+    return p_str_family.value.decode(), p_str_genus.value.decode(), p_str_species.value.decode()
 
 
 def em_measurement_count_fgs(family: str, genus: str, species: str) -> tuple:
