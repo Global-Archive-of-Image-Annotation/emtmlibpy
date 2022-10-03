@@ -33,11 +33,11 @@ class TestEmtmlibpy(unittest.TestCase):
         self.assertIs(EMTMResult(r), EMTMResult(0))
 
         r = emtm.em_op_code()
-        self.assertEqual(r, b'Test')
+        self.assertEqual(r, 'Test')
 
     def test_em_units(self):
         r = emtm.em_units()
-        self.assertEqual(r, b'mm')
+        self.assertEqual(r, 'mm')
 
     def test_em_unique_fgs(self):
         r = emtm.em_unique_fgs()
@@ -46,12 +46,12 @@ class TestEmtmlibpy(unittest.TestCase):
     def test_get_unique_fgs(self):
         r = emtm.em_load_data(os.path.join(TEST_FILES_PATH, 'Test.EMObs'))
 
-        fgs = [(b'', b'', b''),
-               (b'balistidae', b'abalistes', b'stellatus'),
-               (b'nemipteridae', b'nemipterus', b'furcosus'),
-               (b'nemipteridae', b'pentapodus', b'porosus'),
-               (b'pinguipedidae', b'parapercis', b'xanthozona'),
-               (b'scombridae', b'scomberomorus', b'queenslandicus')]
+        fgs = [('', '', ''),
+               ('balistidae', 'abalistes', 'stellatus'),
+               ('nemipteridae', 'nemipterus', 'furcosus'),
+               ('nemipteridae', 'pentapodus', 'porosus'),
+               ('pinguipedidae', 'parapercis', 'xanthozona'),
+               ('scombridae', 'scomberomorus', 'queenslandicus')]
 
         n_unique = emtm.em_unique_fgs()
 
