@@ -3,6 +3,7 @@ Abstraction library for libEMTLib.so from SeaGIS.
 Requires a licence to use, this is just a python wrapping function
 """
 import ctypes
+import dataclasses
 import typing
 from enum import IntEnum, auto
 from collections import namedtuple
@@ -848,3 +849,30 @@ def em_to_dataframe(em_data_type='length') -> pd.DataFrame:
 
     return _dataframe_from_count_and_record_reader(count, record_read_function)
 
+
+@dataclasses.dataclass
+class EmAnnotationDataFrames:
+    """
+    Helper class to represent the Pandas DataFrames which can be read from the an EMObs file and associate them with
+    the relevant loading logic.
+
+    By default, all three possible tables are read automatically, when instantiating this class. To avoid this
+    behaviour for any of the tables, pass an explicit None for that table to the constructor.
+
+    The contained static methods can be used to load only specific tables.
+    """
+    @staticmethod
+    def load_points_from_current_em_file():
+        return _dataframe_from_count_and_record_reader(em_point_count().total, em_get_point)
+
+    @staticmethod
+    def load_3d_points_from_current_em_file():
+        return _dataframe_from_count_and_record_reader(em_3d_point_count(), em_get_3d_point)
+
+    @staticmethod
+    def load_lengths_from_current_em_file():
+        return _dataframe_from_count_and_record_reader(em_get_length_count().total, em_get_length)
+
+    points: pd.DataFrame = dataclasses.field(default_factory=load_points_from_current_em_file.__get__(object))
+    points3d: pd.DataFrame = dataclasses.field(default_factory=load_3d_points_from_current_em_file.__get__(object))
+    lengths: pd.DataFrame = dataclasses.field(default_factory=load_lengths_from_current_em_file.__get__(object))
