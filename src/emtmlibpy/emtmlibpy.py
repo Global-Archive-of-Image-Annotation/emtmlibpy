@@ -14,6 +14,11 @@ EMTM_MAX_CHARS = 1024
 libc = ctypes.CDLL('libEMTMLib.so')
 
 
+class EmTmError(Exception):
+    def __int__(self, error: "EMTMResult", *args, **kwargs):
+        super(EmTmError, self).__int__(f"EMTMLib returned error code {error.value} ({error.name}).")
+
+
 class EMTMResult(IntEnum):
     """
     libStereoLibLX returns result codes.  This enumerates the codes.
@@ -23,6 +28,10 @@ class EMTMResult(IntEnum):
     invalid_licence = auto()
     invalid_index = auto()
     buffer_too_small = auto()
+
+    def check(self):
+        if self.value != self.ok:
+            raise EmTmError(self)
 
 
 class EmPointData(ctypes.Structure):
@@ -351,7 +360,7 @@ def emtm_licence_present() -> bool:
     return True if r == 1 else False
 
 
-def em_load_data(filename: str) -> EMTMResult:
+def em_load_data(filename: str) -> None:
     """
     The EventMeasure data file (.EMObs) to load
 
@@ -366,9 +375,10 @@ def em_load_data(filename: str) -> EMTMResult:
     You do not need to call `EMClearData` before calling this function.
 
     :param filename:
-    :return: EMTMResult
+    :raises EmTmError if the underlying library does not return "OK"
+    :return: None
     """
-    return EMTMResult(libc.EMLoadData(bytes(filename, 'UTF-8')))
+    EMTMResult(libc.EMLoadData(bytes(filename, 'UTF-8'))).check()
 
 
 def em_clear_data() -> None:
@@ -393,13 +403,14 @@ def em_op_code(n_buff_sz: int = EMTM_MAX_CHARS) -> str:
     responsible for allocating enough space for at least nBuffSz
     characters in this buffer.
     :param n_buff_sz: The size of the buffer (pStrOpCode)
+    :raises EmTmError if the underlying library does not return "OK"
     :return: Will return buffer_too_small if the OpCode will not fit in the
     supplied buffer, ok for success.
     """
 
     op_code = ctypes.create_string_buffer(n_buff_sz)
 
-    libc.EMOpCode(ctypes.byref(op_code), n_buff_sz)
+    EMTMResult(libc.EMOpCode(ctypes.byref(op_code), n_buff_sz)).check()
 
     return op_code.value.decode()
 
@@ -413,13 +424,14 @@ def em_units(n_buff_sz: int = EMTM_MAX_CHARS) -> str:
     responsible for allocating enough space for at least nBuffSz
     characters in this buffer.
     :param n_buff_sz: The size of the buffer (pStrUnits).
+    :raises EmTmError if the underlying library does not return "OK"
     :return: Will return buffer_too_small if the units string will not fit in the
     supplied buffer, ok for success.
     """
 
     p_str_units = ctypes.create_string_buffer(n_buff_sz)
 
-    libc.EMUnits(ctypes.byref(p_str_units))
+    EMTMResult(libc.EMUnits(ctypes.byref(p_str_units))).check()
 
     return p_str_units.value.decode()
 
@@ -475,6 +487,7 @@ def em_get_unique_fgs(n_index: int) -> tuple:
 
     Family, genus, species has some sample test data.
     :return: 
+    :raises EmTmError if the underlying library does not return "OK"
     """
 
     n_index = ctypes.c_int(n_index)
@@ -486,6 +499,7 @@ def em_get_unique_fgs(n_index: int) -> tuple:
     success = libc.EMGetUniqueFGS(n_index,
                                   ctypes.byref(p_str_family), ctypes.byref(p_str_genus), ctypes.byref(p_str_species),
                                   EMTM_MAX_CHARS)
+    EMTMResult(success).check()
 
     return p_str_family.value.decode(), p_str_genus.value.decode(), p_str_species.value.decode()
 
@@ -590,12 +604,14 @@ def em_get_point(n_index: int) -> EmPointData:
     EMPointData structure will be filled to their allowed capacity, then the
     string data is truncated to avoid overflow
     :param n_index:
+    :raises EmTmError if the underlying library does not return "OK"
     :return:
     """
 
     p = EmPointData()
 
     r = libc.EMGetPoint(n_index, ctypes.byref(p))
+    EMTMResult(r).check()
 
     return p
 
@@ -641,12 +657,14 @@ def em_get_3d_point(n_index: int) -> Em3DPpointData:
     EM3DPointData structure will be filled to their allowed capacity, then the
     string data is truncated to avoid overflow.
     :param n_index:
+    :raises EmTmError if the underlying library does not return "OK"
     :return:
     """
 
     xyz_point = Em3DPpointData()
 
     r = libc.EMGet3DPoint(n_index, ctypes.byref(xyz_point))
+    EMTMResult(r).check()
 
     return xyz_point
 
@@ -700,17 +718,19 @@ def em_get_length(n_index: int) -> EmLengthData:
 
     :param n_index: The 0-based index of the required measurement. This value must be
     ≥ 0, and < the value returned by EMLengthCount.
+    :raises EmTmError if the underlying library does not return "OK"
     :return:
     """
 
     length_data = EmLengthData()
 
     r = libc.EMGetLength(n_index, ctypes.byref(length_data))
+    EMTMResult(r).check()
 
     return length_data
 
 
-def tm_load_data(filename: str) -> EMTMResult:
+def tm_load_data(filename: str) -> None:
     """
     Use this function to load a TransectMeasure data file.
     The TransectMeasure data loaded with this function remains persistent
@@ -723,14 +743,12 @@ def tm_load_data(filename: str) -> EMTMResult:
     You do not need to call TMClearData before calling this function.
 
     :param filename: The TransectMeasure data file (.TMObs) to load.
-    :return: Will return invalid_licence if the licence is invalid, failed if the
-    TransectMeasure data file (pStrFileName) cannot be read, ok if the
-    TransectMeasure data file was read successfully.
-
+    :raises: EmTmError if the underlying library does not return "OK"
+    :return:
     """
 
     r = libc.TMLoadData(bytes(filename, 'UTF-8'))
-    return EMTMResult(r)
+    EMTMResult(r).check()
 
 
 def tm_clear_data() -> None:
@@ -786,11 +804,13 @@ def tm_get_point(n_index) -> TmPointData:
 
 
     :param n_index:
+    :raises EmTmError if the underlying library does not return "OK"
     :return:
     """
     p = TmPointData()
 
     r = libc.TMGetPoint(n_index, ctypes.byref(p))
+    EMTMResult(r).check()
 
     return p
 
@@ -833,6 +853,7 @@ def em_to_dataframe(em_data_type='length') -> pd.DataFrame:
     A convenience method for returning a data frame instead of ctypes object.
 
     :param em_data_type: Either length or point
+    :raises EmTmError if the underlying library does not return "OK"
     :return: pandas dataframe
     """
     if 'length' in em_data_type:

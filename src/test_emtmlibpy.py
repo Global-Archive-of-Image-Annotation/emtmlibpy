@@ -24,23 +24,25 @@ class TestEmtmlibpy(unittest.TestCase):
         self.assertTrue(r)
 
     def test_em_load_data(self):
-        r = emtm.em_load_data(os.path.join(TEST_FILES_PATH, 'Test.EMObs'))
-        self.assertIs(EMTMResult(r), EMTMResult(0))
+        self.assertRaises(emtm.EmTmError, emtm.em_load_data, "fake path")
+        self.assertRaises(emtm.EmTmError, emtm.em_load_data, "/totally/fake/and/made/up/path/which/surely/doesnt/exist/on/anyones/machine")
+        self.assertRaises(emtm.EmTmError, emtm.em_load_data, "")
+        emtm.em_load_data(os.path.join(TEST_FILES_PATH, 'Test.EMObs'))
 
     def test_em_clear_data(self):
-        r = emtm.em_load_data(os.path.join(TEST_FILES_PATH, 'Test.EMObs'))
-        self.assertIs(EMTMResult(r), EMTMResult(0))
+        emtm.em_load_data(os.path.join(TEST_FILES_PATH, 'Test.EMObs'))
 
         emtm.em_clear_data()
 
     def test_em_op_code(self):
-        r = emtm.em_load_data(os.path.join(TEST_FILES_PATH, 'Test.EMObs'))
-        self.assertIs(EMTMResult(r), EMTMResult(0))
+        # self.assertRaises(emtm.EmTmError, emtm.em_op_code)  # FIXME: EMOpCode() appears to return success, even if no file is loaded!
+        emtm.em_load_data(os.path.join(TEST_FILES_PATH, 'Test.EMObs'))
 
         r = emtm.em_op_code()
         self.assertEqual(r, 'Test')
 
     def test_em_units(self):
+        # self.assertRaises(emtm.EmTmError, emtm.em_units)  # FIXME: EMUnits() appears to return success, even if no file is loaded!
         r = emtm.em_units()
         self.assertEqual(r, 'mm')
 
@@ -50,7 +52,10 @@ class TestEmtmlibpy(unittest.TestCase):
         self.assertEqual(r, 6)
 
     def test_get_unique_fgs(self):
-        r = emtm.em_load_data(os.path.join(TEST_FILES_PATH, 'Test.EMObs'))
+        self.assertRaises(emtm.EmTmError, emtm.em_get_unique_fgs, -1)
+        self.assertRaises(emtm.EmTmError, emtm.em_get_unique_fgs, 0)
+        self.assertRaises(emtm.EmTmError, emtm.em_get_unique_fgs, 1)
+        emtm.em_load_data(os.path.join(TEST_FILES_PATH, 'Test.EMObs'))
 
         fgs = [('', '', ''),
                ('balistidae', 'abalistes', 'stellatus'),
@@ -61,9 +66,11 @@ class TestEmtmlibpy(unittest.TestCase):
 
         n_unique = emtm.em_unique_fgs()
 
+        self.assertRaises(emtm.EmTmError, emtm.em_get_unique_fgs, -1)
         for ii in range(n_unique):
             r = emtm.em_get_unique_fgs(ii)
             self.assertTupleEqual(r, fgs[ii])
+        self.assertRaises(emtm.EmTmError, emtm.em_get_unique_fgs, ii + 1)
 
     def test_em_measurement_count_fgs(self):
         emtm.em_load_data(os.path.join(TEST_FILES_PATH, 'Test.EMObs'))
@@ -90,6 +97,9 @@ class TestEmtmlibpy(unittest.TestCase):
         self.assertTupleEqual(r, PointCount(total=35, bbox=4))
 
     def test_em_get_point(self):
+        self.assertRaises(emtm.EmTmError, emtm.em_get_point, -1)
+        self.assertRaises(emtm.EmTmError, emtm.em_get_point, 0)
+        self.assertRaises(emtm.EmTmError, emtm.em_get_point, 1)
         r = emtm.em_load_data(os.path.join(TEST_FILES_PATH, 'Test.EMObs'))
         point_count = emtm.em_point_count()
         # print(point_count)
@@ -99,11 +109,13 @@ class TestEmtmlibpy(unittest.TestCase):
         em_point_fields = [field[0] for field in p._fields_]
         # print(em_point_fields)
 
+        self.assertRaises(emtm.EmTmError, emtm.em_get_point, -1)
         for ii in range(point_count.total):
             em_point_values = []
             p = emtm.em_get_point(ii)
             for fields in em_point_fields:
                 em_point_values.append(p.__getattribute__(fields))
+        self.assertRaises(emtm.EmTmError, emtm.em_get_point, ii + 1)
 
             # print(em_point_values)  # just so we can get the fields
 
@@ -113,6 +125,9 @@ class TestEmtmlibpy(unittest.TestCase):
         self.assertEqual(r, 2)
 
     def test_em_get_3d_point(self):
+        self.assertRaises(emtm.EmTmError, emtm.em_get_3d_point, -1)
+        self.assertRaises(emtm.EmTmError, emtm.em_get_3d_point, 0)
+        self.assertRaises(emtm.EmTmError, emtm.em_get_3d_point, 1)
         r = emtm.em_load_data(os.path.join(TEST_FILES_PATH, 'Test.EMObs'))
         point_count = emtm.em_3d_point_count()
         # print(point_count)
@@ -122,6 +137,7 @@ class TestEmtmlibpy(unittest.TestCase):
         em_point_fields = [field[0] for field in p._fields_]
         # print(em_point_fields)
 
+        self.assertRaises(emtm.EmTmError, emtm.em_get_3d_point, -1)
         for ii in range(point_count):
             em_point_values = []
             p = emtm.em_get_3d_point(ii)
@@ -129,6 +145,7 @@ class TestEmtmlibpy(unittest.TestCase):
                 em_point_values.append(p.__getattribute__(fields))
 
             # print(em_point_values)
+        self.assertRaises(emtm.EmTmError, emtm.em_get_3d_point, ii + 1)
 
     def test_em_get_length_count(self):
         r = emtm.em_load_data(os.path.join(TEST_FILES_PATH, 'Test.EMObs'))
@@ -139,6 +156,9 @@ class TestEmtmlibpy(unittest.TestCase):
         self.assertTupleEqual(pn_compound, LengthCount(total=22, compound=0))
 
     def test_em_get_length(self):
+        self.assertRaises(emtm.EmTmError, emtm.em_get_length, -1)
+        self.assertRaises(emtm.EmTmError, emtm.em_get_length, 0)
+        self.assertRaises(emtm.EmTmError, emtm.em_get_length, 1)
         r = emtm.em_load_data(os.path.join(TEST_FILES_PATH, 'Test.EMObs'))
         length_count = emtm.em_get_length_count()
         length = emtm.em_get_length(0)
@@ -147,21 +167,25 @@ class TestEmtmlibpy(unittest.TestCase):
         em_length_fields = [field[0] for field in length._fields_]
         # print(em_point_fields)
 
+        self.assertRaises(emtm.EmTmError, emtm.em_get_length, -1)
         for ii in range(length_count.total):
             # print(ii)
             em_length_values = []
             l = emtm.em_get_length(ii)
             for fields in em_length_fields:
                 em_length_values.append(l.__getattribute__(fields))
+        self.assertRaises(emtm.EmTmError, emtm.em_get_length, ii + 1)
 
             # print(em_length_values)
 
     def test_tm_load_data(self):
-        r = emtm.tm_load_data(os.path.join(TEST_FILES_PATH, 'Test.TMObs'))
-        self.assertIs(EMTMResult(r), EMTMResult(0))
+        self.assertRaises(emtm.EmTmError, emtm.tm_load_data, "fake path")
+        self.assertRaises(emtm.EmTmError, emtm.tm_load_data, "/totally/fake/and/made/up/path/which/surely/doesnt/exist/on/anyones/machine")
+        self.assertRaises(emtm.EmTmError, emtm.tm_load_data, "")
+        emtm.tm_load_data(os.path.join(TEST_FILES_PATH, 'Test.TMObs'))
 
     def test_tm_clear_data(self):
-        r = emtm.tm_load_data(os.path.join(TEST_FILES_PATH, 'Test.TMObs'))
+        emtm.tm_load_data(os.path.join(TEST_FILES_PATH, 'Test.TMObs'))
         emtm.tm_clear_data()
 
     def test_tm_point_count(self):
@@ -170,6 +194,9 @@ class TestEmtmlibpy(unittest.TestCase):
         self.assertEqual(r, 10)
 
     def test_tm_get_point(self):
+        self.assertRaises(emtm.EmTmError, emtm.tm_get_point, -1)
+        self.assertRaises(emtm.EmTmError, emtm.tm_get_point, 0)
+        self.assertRaises(emtm.EmTmError, emtm.tm_get_point, 1)
         r = emtm.tm_load_data(os.path.join(TEST_FILES_PATH, 'Test.TMObs'))
         point_count = emtm.tm_point_count()
         p = emtm.tm_get_point(0)
@@ -178,11 +205,13 @@ class TestEmtmlibpy(unittest.TestCase):
         tm_point_fields = [field[0] for field in p._fields_]
         # print(tm_point_fields)
 
+        self.assertRaises(emtm.EmTmError, emtm.tm_get_point, -1)
         for ii in range(point_count):
             tm_point_values = []
             p = emtm.tm_get_point(ii)
             for fields in tm_point_fields:
                 tm_point_values.append(p.__getattribute__(fields))
+        self.assertRaises(emtm.EmTmError, emtm.tm_get_point, ii + 1)
 
             # print(tm_point_values)
 
