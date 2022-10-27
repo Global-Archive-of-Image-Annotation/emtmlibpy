@@ -11,6 +11,10 @@ assert os.path.exists(TEST_FILES_PATH), f"Please ensure you place the required t
 
 class TestEmtmlibpy(unittest.TestCase):
 
+    def tearDown(self) -> None:
+        emtm.em_clear_data()
+        emtm.tm_clear_data()
+
     def test_emtm_version(self):
         r = emtm.emtm_version()
         self.assertTupleEqual(r, (2, 0))
@@ -41,6 +45,7 @@ class TestEmtmlibpy(unittest.TestCase):
         self.assertEqual(r, 'mm')
 
     def test_em_unique_fgs(self):
+        emtm.em_load_data(os.path.join(TEST_FILES_PATH, 'Test.EMObs'))
         r = emtm.em_unique_fgs()
         self.assertEqual(r, 6)
 
@@ -61,6 +66,8 @@ class TestEmtmlibpy(unittest.TestCase):
             self.assertTupleEqual(r, fgs[ii])
 
     def test_em_measurement_count_fgs(self):
+        emtm.em_load_data(os.path.join(TEST_FILES_PATH, 'Test.EMObs'))
+
         FGS = namedtuple('FGS', 'point box xyz_point, length cpd_length')
 
         r = emtm.em_measurement_count_fgs('balistidae', 'abalistes', 'stellatus')
