@@ -102,12 +102,10 @@ class TestEmtmlibpy(unittest.TestCase):
         self.assertRaises(emtm.EmTmError, emtm.em_get_point, 1)
         r = emtm.em_load_data(os.path.join(TEST_FILES_PATH, 'Test.EMObs'))
         point_count = emtm.em_point_count()
-        # print(point_count)
         p = emtm.em_get_point(0)  # just so we can get the fields
 
         em_point_values = []
         em_point_fields = [field[0] for field in p._fields_]
-        # print(em_point_fields)
 
         self.assertRaises(emtm.EmTmError, emtm.em_get_point, -1)
         for ii in range(point_count.total):
@@ -116,8 +114,6 @@ class TestEmtmlibpy(unittest.TestCase):
             for fields in em_point_fields:
                 em_point_values.append(p.__getattribute__(fields))
         self.assertRaises(emtm.EmTmError, emtm.em_get_point, ii + 1)
-
-            # print(em_point_values)  # just so we can get the fields
 
     def test_em_3d_point_count(self):
         r = emtm.em_load_data(os.path.join(TEST_FILES_PATH, 'Test.EMObs'))
@@ -130,12 +126,10 @@ class TestEmtmlibpy(unittest.TestCase):
         self.assertRaises(emtm.EmTmError, emtm.em_get_3d_point, 1)
         r = emtm.em_load_data(os.path.join(TEST_FILES_PATH, 'Test.EMObs'))
         point_count = emtm.em_3d_point_count()
-        # print(point_count)
         p = emtm.em_get_3d_point(0)  # just so we can get the fields
 
         em_point_values = []
         em_point_fields = [field[0] for field in p._fields_]
-        # print(em_point_fields)
 
         self.assertRaises(emtm.EmTmError, emtm.em_get_3d_point, -1)
         for ii in range(point_count):
@@ -143,8 +137,6 @@ class TestEmtmlibpy(unittest.TestCase):
             p = emtm.em_get_3d_point(ii)
             for fields in em_point_fields:
                 em_point_values.append(p.__getattribute__(fields))
-
-            # print(em_point_values)
         self.assertRaises(emtm.EmTmError, emtm.em_get_3d_point, ii + 1)
 
     def test_em_get_length_count(self):
@@ -165,18 +157,14 @@ class TestEmtmlibpy(unittest.TestCase):
 
         em_length_values = []
         em_length_fields = [field[0] for field in length._fields_]
-        # print(em_point_fields)
 
         self.assertRaises(emtm.EmTmError, emtm.em_get_length, -1)
         for ii in range(length_count.total):
-            # print(ii)
             em_length_values = []
             l = emtm.em_get_length(ii)
             for fields in em_length_fields:
                 em_length_values.append(l.__getattribute__(fields))
         self.assertRaises(emtm.EmTmError, emtm.em_get_length, ii + 1)
-
-            # print(em_length_values)
 
     def test_tm_load_data(self):
         self.assertRaises(emtm.EmTmError, emtm.tm_load_data, "fake path")
@@ -203,7 +191,6 @@ class TestEmtmlibpy(unittest.TestCase):
 
         tm_point_values = []
         tm_point_fields = [field[0] for field in p._fields_]
-        # print(tm_point_fields)
 
         self.assertRaises(emtm.EmTmError, emtm.tm_get_point, -1)
         for ii in range(point_count):
@@ -212,8 +199,6 @@ class TestEmtmlibpy(unittest.TestCase):
             for fields in tm_point_fields:
                 tm_point_values.append(p.__getattribute__(fields))
         self.assertRaises(emtm.EmTmError, emtm.tm_get_point, ii + 1)
-
-            # print(tm_point_values)
 
     def test_em_to_dataframe(self):
         emtm.em_load_data(os.path.join(TEST_FILES_PATH, 'Test.EMObs'))
