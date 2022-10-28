@@ -212,6 +212,10 @@ class TestEmtmlibpy(unittest.TestCase):
         self.assertEqual(len(points3d_df), 2)
         self.assertEqual(len(lengths_df), 22)
 
+        self.assertListEqual(list(points_df.columns), [field_info[0] for field_info in emtm.EmPointData._fields_])
+        self.assertListEqual(list(points3d_df.columns), [field_info[0] for field_info in emtm.Em3DPpointData._fields_])
+        self.assertListEqual(list(lengths_df.columns), [field_info[0] for field_info in emtm.EmLengthData._fields_])
+
     def test_starting_with_empty_EmAnnotationDataFrames_object(self):
         emtm.em_load_data(os.path.join(os.path.join(TEST_FILES_PATH, 'Test.EMObs')))
         dfs = emtm.EmAnnotationDataFrames(None, None, None)

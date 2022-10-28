@@ -834,7 +834,7 @@ def _dataframe_from_count_and_record_reader(count: int, record_read_function: ty
     dtype_template = 'object'
     p = record_read_function(0)
 
-    index = [attr for attr in dir(p) if (not attr.startswith('__') and not attr.startswith('_'))]
+    index = [field_info[0] for field_info in p._fields_]
     data = np.empty(shape=[count, len(index)], dtype=dtype_template)  # change these
 
     for jj in range(count):
